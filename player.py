@@ -1,5 +1,5 @@
 from settings import Settings
-import pygame
+import pygame.font
 
 
 class Player:
@@ -18,6 +18,7 @@ class Player:
         self.jumping = False
         self.jump_up_value = 0
         self.falling = False
+        self.life_count = LifeCount(self.game)
 
     def to_left(self):
         self.image = pygame.image.load(self.settings.player_left_image)
@@ -66,3 +67,21 @@ class Player:
 
     def blit(self):
         self.screen.blit(self.image, self.rect)
+        self.life_count.blit()
+
+
+class LifeCount:
+    def __init__(self, game):
+        self.game = game
+        self.count = 0
+        self.screen: pygame.surface.Surface = self.game.screen
+        self.screen_rect = self.screen.get_rect()
+        self.settings = Settings()
+        self.font = pygame.font.SysFont(None, 100)
+        self.colors = (255, 0, 0), (255, 120, 0), (0, 255, 0), (0, 0, 0)
+
+    def blit(self):
+        text = self.font.render(str(self.count), True, self.colors[self.count - 1])
+        rect = text.get_rect()
+        rect.topleft = self.screen_rect.topleft
+        self.screen.blit(text, rect)
