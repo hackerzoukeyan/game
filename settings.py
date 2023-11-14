@@ -1,4 +1,5 @@
 class Settings:
+    screen_width, screen_height = 1000, 800
     bg_color = 135, 206, 250
     player_right_image = 'images/right.bmp'
     player_left_image = 'images/left.bmp'
@@ -17,7 +18,7 @@ class Settings:
     door_image = 'images/door.bmp'
     door_opened_image = 'images/door_opened.bmp'
     max_score = 10
-    max_level = 4
+    max_level = 3
     bg_mp3 = 'mp3/bg_mp3.mp3'
     game_over_sound = 'mp3/game_over.mp3'
     score_sound = 'mp3/score.mp3'
