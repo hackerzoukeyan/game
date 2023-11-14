@@ -14,11 +14,11 @@ import sys
 
 class Game:
     def __init__(self):
+        self.settings = Settings()
         pygame.init()
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption('Game')
         pygame.mouse.set_visible(False)
-        self.settings = Settings()
         self.score = None
         self.player = Player(self)
         self.bricks = pygame.sprite.Group()
@@ -34,6 +34,7 @@ class Game:
         self.score_sound = pygame.mixer.Sound(self.settings.score_sound)
         self.win_sound = pygame.mixer.Sound(self.settings.win_sound)
         self.tc = TimeCounter(self)
+        self.clock = pygame.time.Clock()
 
     def prepare_world(self):
         self.score = 0
@@ -41,7 +42,8 @@ class Game:
         self.add_bricks()
         self.add_scores()
         self.door = Door(self, self.json['door']['x'], self.json['door']['y'])
-        
+        self.player.life_count.count = 3
+
     def add_bricks(self):
         brick_positions = zip(self.json['bricks']['x'], self.json['bricks']['y'])
         for x, y in brick_positions:
@@ -68,6 +70,7 @@ class Game:
             self.add_scores()
         if self.score == self.settings.max_score:
             self.door.open()
+            self.scores.empty()
 
     def check_monsters(self):
         for x in self.monsters.sprites():
@@ -76,9 +79,17 @@ class Game:
 
     def check_lose(self):
         if pygame.sprite.spritecollide(self.player, self.monsters, True):
-            self.score -= 5
+            self.player.life_count.count -= 1
+            if self.player.life_count.count == 0:
+                self.game_over()
         if self.tc.timeout():
             self.timeout()
+
+    def game_over(self):
+        self.game_finished = True
+        self.msg.msg = 'Game Over(press Q to quit.)'
+        pygame.mixer.music.stop()
+        self.game_over_sound.play()
 
     def timeout(self):
         self.game_finished = True
@@ -87,7 +98,7 @@ class Game:
         self.game_over_sound.play()
 
     def check_quit(self, event: pygame.event.Event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+        if (event.type == pygame.KEYDOWN and event.key == pygame.K_q) or (event.type == pygame.QUIT):
             self.sb.save_high_score()
             self.sb.save_level()
             sys.exit()
@@ -122,7 +133,7 @@ class Game:
     def win(self):
         if self.sb.level == self.settings.max_level:
             self.game_finished = True
-            self.msg.msg = 'You win!(Press Q tu quit.)'
+            self.msg.msg = 'You win!(Press Q to quit.)'
             pygame.mixer.music.stop()
             self.win_sound.play()
             return
@@ -166,6 +177,7 @@ class Game:
                 self.monsters.update()
             self.check_events()
             self.update_screen()
+            self.clock.tick(500)
 
 
 if __name__ == '__main__':
