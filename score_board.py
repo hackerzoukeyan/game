@@ -20,9 +20,9 @@ class ScoreBoard:
         open('high_score.txt', 'w', encoding='utf-8').write(str(self.high_score))
 
     def save_level(self):
-        if self.level <= self.settings.max_level:
+        if self.level < self.settings.max_level:
             open('level.txt', 'w', encoding='utf-8').write(str(self.level))
-        if self.level == self.settings.max_level and self.game.msg.msg == 'You win!(Press Q tu quit.)':
+        if self.level == self.settings.max_level and self.game.msg.msg == 'You win!(Press Q to quit.)':
             open('level.txt', 'w', encoding='utf-8').write('1')
 
     def blit(self):
